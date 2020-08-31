@@ -7,12 +7,19 @@ import { fetchFlightLists } from "./../redux/api";
 import OneWayForm from "./One-Way-Form";
 import ReturnForm from "./Return-Form";
 
+import takeOff from "./../assets/airplane-take-off.png";
+
 class FlightList extends Component {
   constructor(props) {
     super(props);
     this.state = {
       flights: [],
       passengers: 1,
+      flightMode: "",
+      origin: "",
+      destination: "",
+      date: "",
+      flightsFound: "",
     };
   }
 
@@ -22,7 +29,13 @@ class FlightList extends Component {
   }
 
   getOneWayDetails = (filteredDetails) => {
-    const { origin, destination, date, passengers } = filteredDetails;
+    const {
+      origin,
+      destination,
+      date,
+      passengers,
+      flightMode,
+    } = filteredDetails;
 
     var filterBy = {
       date: moment(date).format("YYYY/MM/DD"),
@@ -37,9 +50,17 @@ class FlightList extends Component {
       return true;
     });
 
-    console.log("filteredFlights: ", filteredFlights);
+    console.log(filteredFlights.length);
 
-    this.setState({ flights: filteredFlights, passengers: passengers });
+    this.setState({
+      flights: filteredFlights,
+      passengers: passengers,
+      flightMode: flightMode,
+      origin: origin,
+      destination: destination,
+      date: date,
+      flightsFound: filteredFlights.length,
+    });
   };
 
   componentWillReceiveProps(props) {
@@ -49,7 +70,15 @@ class FlightList extends Component {
   }
 
   render() {
-    const { flights, passengers } = this.state;
+    const {
+      flights,
+      passengers,
+      flightMode,
+      origin,
+      destination,
+      date,
+      flightsFound,
+    } = this.state;
 
     return (
       <>
@@ -111,6 +140,26 @@ class FlightList extends Component {
           </div>
         </div>
         <div className="col-sm-6 col-lg-9 ">
+          {flightMode && flightMode === "oneWay" && (
+            <div className="card mt-2 mb-2">
+              <div className="row">
+                <div className="col-sm-6 col-lg-2">
+                  <img src={takeOff} width="100" height="100" alt="" />
+                </div>
+                <div className="col-sm-6 col-lg-10">
+                  <h1>
+                    <strong>
+                      {origin} To {destination}
+                    </strong>
+                  </h1>
+                  <p className="text-muted">
+                    {flightsFound} Flights Found,{" "}
+                    {moment(date).format("MMM, Do YYYY")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           {flights.map((flight, index) => {
             return (
               <div className="card mt-2 mb-2" key={index}>

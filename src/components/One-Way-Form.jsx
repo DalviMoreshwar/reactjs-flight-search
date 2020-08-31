@@ -7,10 +7,11 @@ class OneWayForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      origin: "",
-      destination: "",
-      passengers: "",
-      departureDate: new Date(),
+      origin: [],
+      destination: [],
+      passengers: [],
+      departureDate: null,
+      activeAlertMsg: false,
     };
   }
 
@@ -26,16 +27,33 @@ class OneWayForm extends Component {
   onSearch = (event) => {
     event.preventDefault();
     const { origin, destination, departureDate, passengers } = this.state;
-    if ((origin !== "", destination !== "", passengers !== "")) {
+    console.log(origin, destination, departureDate, passengers);
+    if (
+      origin.length !== 0 &&
+      destination.length !== 0 &&
+      passengers.length !== 0 &&
+      (departureDate !== null || departureDate !== "")
+    ) {
+      this.setState({ activeAlertMsg: false });
       let obj = {
         origin: origin[0].value,
         destination: destination[0].value,
         date: departureDate,
         passengers: passengers[0].value,
+        flightMode: "oneWay",
       };
       this.props.onOneWayForm(obj);
     } else {
-      console.log("empty");
+      this.setState(
+        {
+          activeAlertMsg: true,
+        },
+        () => {
+          setTimeout(() => {
+            this.setState({ activeAlertMsg: false });
+          }, 3500);
+        }
+      );
     }
   };
 
@@ -45,7 +63,6 @@ class OneWayForm extends Component {
   };
 
   clearOrigin = (e) => {
-    console.log(e);
     this.setState({ origin: [] });
   };
 
@@ -55,7 +72,6 @@ class OneWayForm extends Component {
   };
 
   clearDestination = (e) => {
-    console.log(e);
     this.setState({ destination: [] });
   };
 
@@ -64,11 +80,11 @@ class OneWayForm extends Component {
     this.setState({ passengers: params });
   };
   clearPassenger = (e) => {
-    console.log(e);
     this.setState({ passengers: [] });
   };
 
   render() {
+    const { activeAlertMsg } = this.state;
     return (
       <div>
         <form className="mt-2">
@@ -134,7 +150,9 @@ class OneWayForm extends Component {
         >
           {this.props.title}
         </button>
-        <div className="mt-2 text-danger">Fields should not be empty!</div>
+        {activeAlertMsg && (
+          <div className="mt-2 text-danger">All fields are compulsory!</div>
+        )}
       </div>
     );
   }
